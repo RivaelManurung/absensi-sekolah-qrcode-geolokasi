@@ -44,7 +44,7 @@ class ScheduleController extends Controller
         $schedulesByDay = $schedules->groupBy('day_of_week');
 
         // Arahkan ke view khusus untuk guru/siswa
-        return view('schedules.index', [
+        return view('user.schedules.index', [
             'schedulesByDay' => $schedulesByDay,
             'pageTitle' => 'Jadwal Pelajaran'
         ]);
