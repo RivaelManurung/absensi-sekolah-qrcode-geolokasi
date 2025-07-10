@@ -14,7 +14,9 @@ class ClassController extends Controller
     {
         // withCount untuk menghitung jumlah siswa secara efisien
         $classes = Kelas::with('homeroomTeacher', 'academicYear')->withCount('students')->latest()->paginate(10);
-        return view('admin.classes.index', compact('classes'));
+        $academicYears = AcademicYear::orderBy('year', 'desc')->get();
+        $teachers = Teacher::orderBy('full_name')->get();
+        return view('admin.classes.index', compact('classes','academicYears','teachers'));
     }
 
     public function create()

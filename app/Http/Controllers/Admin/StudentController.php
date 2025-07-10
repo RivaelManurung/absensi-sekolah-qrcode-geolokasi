@@ -15,8 +15,10 @@ class StudentController extends Controller
     public function index()
     {
         $students = Student::with('class', 'user')->latest()->paginate(10);
-        return view('admin.students.index', compact('students'));
+        $classes = Kelas::orderBy('name')->get(); // Tambahkan ini
+        return view('admin.students.index', compact('students', 'classes')); // Kirim ke view
     }
+
 
     public function create()
     {
@@ -92,7 +94,7 @@ class StudentController extends Controller
             'gender' => 'required|in:laki-laki,perempuan',
             'date_of_birth' => 'required|date',
         ]);
-        
+
         // Update data di tabel students
         $student->update($request->all());
 
@@ -111,9 +113,9 @@ class StudentController extends Controller
         try {
             $student->delete();
         } catch (\Exception $e) {
-             return back()->with('error', 'Gagal menghapus siswa.');
+            return back()->with('error', 'Gagal menghapus siswa.');
         }
-        
+
         return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil dihapus.');
     }
 }

@@ -2,7 +2,7 @@
     <div class="app-brand demo">
         <a href="{{ route('admin.dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
-                <img src="{{ asset('assets/Logo.png') }}" alt="Logo" width="30" /> {{-- Ganti dengan logo Anda --}}
+                <img src="{{ asset('assets/Logo.png') }}" alt="Logo" width="30" />
             </span>
             <span class="app-brand-text demo menu-text fw-bold ms-2">Absensi</span>
         </a>
@@ -26,15 +26,24 @@
             <span class="menu-header-text">Manajemen Utama</span>
         </li>
         <li class="menu-item {{ Request::is('admin/schedules*') ? 'active' : '' }}">
-            <a href="#" class="menu-link"> {{-- Ganti # dengan route jadwal jika sudah dibuat --}}
+            {{-- DIUBAH: Menggunakan route schedules.index --}}
+            <a href="{{ route('admin.schedules.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-calendar"></i>
                 <div class="text-truncate" data-i18n="Schedules">Jadwal Pelajaran</div>
             </a>
         </li>
         <li class="menu-item {{ Request::is('admin/attendances*') ? 'active' : '' }}">
-            <a href="#" class="menu-link"> {{-- Ganti # dengan route absensi jika sudah dibuat --}}
+            {{-- Belum ada controller, jadi link masih # --}}
+            <a href="#" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-check-square"></i>
-                <div class="text-truncate" data-i18n="Attendances">Data Absensi</div>
+                <div class="text-truncate" data-i18n="Attendances">Laporan Absensi</div>
+            </a>
+        </li>
+        {{-- DITAMBAHKAN: Menu untuk Pengajuan Izin --}}
+        <li class="menu-item {{ Request::is('admin/leave-requests*') ? 'active' : '' }}">
+            <a href="{{ route('admin.leave-requests.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-envelope"></i>
+                <div class="text-truncate" data-i18n="Leave Requests">Pengajuan Izin</div>
             </a>
         </li>
 
@@ -66,7 +75,8 @@
             </a>
         </li>
         <li class="menu-item {{ Request::is('admin/academic-years*') ? 'active' : '' }}">
-            <a href="#" class="menu-link"> {{-- Ganti # dengan route tahun ajaran jika sudah dibuat --}}
+            {{-- DIUBAH: Menggunakan route academic-years.index --}}
+            <a href="{{ route('admin.academic-years.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-calendar-edit"></i>
                 <div class="text-truncate" data-i18n="Academic Years">Tahun Ajaran</div>
             </a>
