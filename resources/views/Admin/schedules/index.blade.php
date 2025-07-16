@@ -4,6 +4,32 @@
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
+        {{-- Notifikasi dari Session (Sudah ada) --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Berhasil!</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Gagal!</strong> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- ✅ SOLUSI: TAMBAHKAN BLOK INI UNTUK MENAMPILKAN ERROR VALIDASI --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi Kesalahan!</strong> Mohon periksa input Anda:
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Manage Schedules</h5>
@@ -25,22 +51,26 @@
                 </thead>
                 <tbody class="table-border-bottom-0">
                     @php
-                        // Array untuk menerjemahkan nomor hari ke nama hari
-                        $days = ['1' => 'Senin', '2' => 'Selasa', '3' => 'Rabu', '4' => 'Kamis', '5' => 'Jumat', '6' => 'Sabtu'];
+                    // Array untuk menerjemahkan nomor hari ke nama hari
+                    $days = ['1' => 'Senin', '2' => 'Selasa', '3' => 'Rabu', '4' => 'Kamis', '5' => 'Jumat', '6' =>
+                    'Sabtu'];
                     @endphp
 
                     {{-- PERBAIKAN UTAMA: Looping menggunakan variabel $schedules, bukan $schedulesByDay --}}
                     @forelse ($schedules as $schedule)
                     <tr>
                         <td><strong>{{ $days[$schedule->day_of_week] ?? 'N/A' }}</strong></td>
-                        <td>{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} - {{
+                            \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }}</td>
                         <td>{{ $schedule->class->name ?? 'N/A' }}</td>
                         <td>{{ $schedule->subject->name ?? 'N/A' }}</td>
                         <td>{{ $schedule->teacher->full_name ?? 'N/A' }}</td>
                         <td>
                             <div class="d-flex">
-                                <a class="btn btn-sm btn-outline-primary me-2" href="{{ route('admin.schedules.edit', $schedule->id) }}">Edit</a>
-                                <form action="{{ route('admin.schedules.destroy', $schedule->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this schedule?');">
+                                <a class="btn btn-sm btn-outline-primary me-2"
+                                    href="{{ route('admin.schedules.edit', $schedule->id) }}">Edit</a>
+                                <form action="{{ route('admin.schedules.destroy', $schedule->id) }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete this schedule?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
@@ -56,12 +86,12 @@
                 </tbody>
             </table>
         </div>
-        
+
         {{-- Menampilkan link pagination --}}
         @if ($schedules->hasPages())
-            <div class="card-footer d-flex justify-content-end">
-                {{ $schedules->links() }}
-            </div>
+        <div class="card-footer d-flex justify-content-end">
+            {{ $schedules->links() }}
+        </div>
         @endif
     </div>
 </div>

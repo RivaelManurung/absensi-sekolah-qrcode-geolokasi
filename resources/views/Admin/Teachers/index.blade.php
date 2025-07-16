@@ -1,7 +1,35 @@
+{{-- resources/views/admin/teachers/index.blade.php --}}
+
 @extends('admin.layout.main')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
+        {{-- Notifikasi dari Session (Sudah ada) --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Berhasil!</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Gagal!</strong> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- ✅ SOLUSI: TAMBAHKAN BLOK INI UNTUK MENAMPILKAN ERROR VALIDASI --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi Kesalahan!</strong> Mohon periksa input Anda:
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Manage Teachers</h5>
@@ -38,6 +66,7 @@
                                     <i class="icon-base bx bx-dots-vertical-rounded"></i>
                                 </button>
                                 <div class="dropdown-menu">
+                                    {{-- Tombol Edit ini sudah benar dalam meneruskan data --}}
                                     <button class="dropdown-item edit-teacher" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#editTeacherModal"
@@ -82,25 +111,27 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Script untuk mengisi data pada Edit Modal
+    // ✅ SCRIPT YANG DIPERBAIKI: Menggunakan `dataset` untuk mengambil data
     document.querySelectorAll('.edit-teacher').forEach(button => {
         button.addEventListener('click', function () {
+            // Ambil data dari atribut `data-*` menggunakan `this.dataset`
+            // Ini cara yang lebih modern dan rapi
+            const id = this.dataset.id;
+            const fullName = this.dataset.fullName;
+            const nuptk = this.dataset.nuptk;
+            const phoneNumber = this.dataset.phoneNumber; // `data-phone-number` menjadi `phoneNumber`
+
+            // Tentukan target modal dan form di dalamnya
             const modal = document.querySelector('#editTeacherModal');
             const form = modal.querySelector('form');
             
-            // Ambil data dari atribut data-*
-            const id = this.getAttribute('data-id');
-            const fullName = this.getAttribute('data-full-name');
-            const nuptk = this.getAttribute('data-nuptk');
-            const phoneNumber = this.getAttribute('data-phone-number');
-
-            // Set action form untuk update
+            // Set action form untuk proses update
             form.action = `{{ url('admin/teachers') }}/${id}`;
             
-            // Isi value pada form di dalam modal
-            modal.querySelector('#edit-teacher-full-name').value = fullName || '';
-            modal.querySelector('#edit-teacher-nuptk').value = nuptk || '';
-            modal.querySelector('#edit-teacher-phone-number').value = phoneNumber || '';
+            // Isi value pada setiap input di dalam modal
+            modal.querySelector('#edit-teacher-full-name').value = fullName;
+            modal.querySelector('#edit-teacher-nuptk').value = nuptk;
+            modal.querySelector('#edit-teacher-phone-number').value = phoneNumber;
         });
     });
 });

@@ -1,11 +1,37 @@
-{{-- resources/views/admin/students/index.blade.php --}}
-
 @extends('admin.layout.main')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    {{-- Notifikasi dari Session (Sudah ada) --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Berhasil!</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Gagal!</strong> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- ✅ SOLUSI: TAMBAHKAN BLOK INI UNTUK MENAMPILKAN ERROR VALIDASI --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Terjadi Kesalahan!</strong> Mohon periksa input Anda:
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- Sisa kode di bawah ini tidak perlu diubah --}}
     <div class="card">
-        {{-- Card Header --}}
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Manage Students</h5>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStudentModal">
@@ -13,9 +39,9 @@
             </button>
         </div>
 
-        {{-- Tabel Siswa --}}
         <div class="table-responsive text-nowrap">
             <table class="table table-hover">
+                {{-- ... isi tabel ... --}}
                 <thead>
                     <tr>
                         <th>#</th>
@@ -44,21 +70,17 @@
                                     <i class="icon-base bx bx-dots-vertical-rounded"></i>
                                 </button>
                                 <div class="dropdown-menu">
-                                    {{-- Ganti tombol lama Anda dengan yang ini --}}
                                     <button class="dropdown-item edit-student" data-bs-toggle="modal"
                                         data-bs-target="#editStudentModal" data-id="{{ $student->id }}"
-                                        data-full-name="{{ $student->full_name }}" {{-- diubah dari fullName --}}
-                                        data-nisn="{{ $student->nisn }}" data-nis="{{ $student->nis }}"
-                                        data-class-id="{{ $student->class_id }}" {{-- diubah dari classId --}}
+                                        data-full-name="{{ $student->full_name }}" data-nisn="{{ $student->nisn }}"
+                                        data-nis="{{ $student->nis }}" data-class-id="{{ $student->class_id }}"
                                         data-gender="{{ $student->gender }}"
-                                        data-date-of-birth="{{ $student->date_of_birth }}"> {{-- diubah dari dateOfBirth
-                                        --}}
+                                        data-date-of-birth="{{ $student->date_of_birth ? \Carbon\Carbon::parse($student->date_of_birth)->format('Y-m-d') : '' }}">
                                         <i class="icon-base bx bx-edit-alt me-1"></i> Edit
                                     </button>
 
-                                    {{-- Delete --}}
                                     <form action="{{ route('admin.students.destroy', $student->id) }}" method="POST"
-                                        onsubmit="return confirm('Are you sure you want to delete this student? This will also delete their login account.');">
+                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus siswa ini? Akun login mereka juga akan terhapus.');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="dropdown-item">
@@ -78,7 +100,6 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
         @if ($students->hasPages())
         <div class="card-footer d-flex justify-content-end">
             {{ $students->links() }}
@@ -87,39 +108,30 @@
     </div>
 </div>
 
-{{-- Include modal create dan edit --}}
 @include('admin.students.create-modal')
 @include('admin.students.edit-modal')
-
 @endsection
 
 @section('scripts')
+{{-- Script Anda sudah benar --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.edit-student').forEach(button => {
+        const editButtons = document.querySelectorAll('.edit-student');
+
+        editButtons.forEach(button => {
             button.addEventListener('click', function () {
-                
-                // BARIS DEBUG: Cetak semua data-* yang diterima ke console
-                console.log(this.dataset); 
-
-                const id = this.dataset.id;
-                const fullName = this.dataset.fullName;
-                const nisn = this.dataset.nisn;
-                const nis = this.dataset.nis;
-                const classId = this.dataset.classId;
-                const gender = this.dataset.gender;
-                const dateOfBirth = this.dataset.dateOfBirth;
-
+                const dataset = this.dataset;
                 const modal = document.querySelector('#editStudentModal');
                 const form = modal.querySelector('form');
 
-                form.action = `{{ url('admin/students') }}/${id}`;
-                modal.querySelector('#edit-student-full-name').value = fullName;
-                modal.querySelector('#edit-student-nisn').value = nisn;
-                modal.querySelector('#edit-student-nis').value = nis;
-                modal.querySelector('#edit-student-class-id').value = classId;
-                modal.querySelector('#edit-student-gender').value = gender;
-                modal.querySelector('#edit-student-date-of-birth').value = dateOfBirth;
+                form.action = `{{ url('admin/students') }}/${dataset.id}`;
+                
+                modal.querySelector('#edit-student-full-name').value = dataset.fullName;
+                modal.querySelector('#edit-student-nisn').value = dataset.nisn;
+                modal.querySelector('#edit-student-nis').value = dataset.nis;
+                modal.querySelector('#edit-student-class-id').value = dataset.classId;
+                modal.querySelector('#edit-student-gender').value = dataset.gender;
+                modal.querySelector('#edit-student-date-of-birth').value = dataset.dateOfBirth;
             });
         });
     });

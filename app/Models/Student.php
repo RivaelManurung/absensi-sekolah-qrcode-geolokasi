@@ -20,9 +20,11 @@ class Student extends Model
 
     public function class()
     {
-        return $this->belongsTo(Kelas::class, 'class_id'); // Nama model Kelas disarankan
+        // Pastikan nama model adalah 'Kelas' sesuai controller
+        return $this->belongsTo(Kelas::class, 'class_id');
     }
 
+    // Relasi lainnya sudah benar
     public function attendances()
     {
         return $this->hasMany(Attendance::class);

@@ -9,113 +9,134 @@ use App\Models\Kelas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log; // ✅ 1. Tambahkan fasad Log
 
 class StudentController extends Controller
 {
     public function index()
     {
         $students = Student::with('class', 'user')->latest()->paginate(10);
-        $classes = Kelas::orderBy('name')->get(); // Tambahkan ini
-        return view('admin.students.index', compact('students', 'classes')); // Kirim ke view
-    }
-
-
-    public function create()
-    {
-        $classes = Kelas::orderBy('name')->get(); // Menggunakan model Kelas
-        return view('admin.students.create', compact('classes'));
+        $classes = Kelas::orderBy('name')->get();
+        return view('admin.students.index', compact('students', 'classes'));
     }
 
     public function store(Request $request)
     {
-        // Validasi data yang masuk
-        $request->validate([
+        // LOG: Mencatat upaya penambahan siswa baru
+        Log::info('Attempting to store a new student.', $request->except('password', 'password_confirmation'));
+
+        $validatedData = $request->validate([
             'full_name' => 'required|string|max:255',
-            'nisn' => 'required|string|unique:students,nisn',
-            'nis' => 'required|string|unique:students,nis',
+            'nisn' => 'required|string|numeric|unique:students,nisn',
+            'nis' => 'required|string|numeric|unique:students,nis',
             'class_id' => 'required|exists:classes,id',
             'gender' => 'required|in:laki-laki,perempuan',
             'date_of_birth' => 'required|date',
-            'username' => 'required|string|unique:users,username',
+            'username' => 'required|string|min:4|unique:users,username',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // Gunakan transaction untuk menjaga konsistensi data
         DB::beginTransaction();
         try {
-            // 1. Buat data user
             $user = User::create([
-                'name' => $request->full_name,
-                'username' => $request->username,
-                'password' => Hash::make($request->password),
+                'name' => $validatedData['full_name'],
+                'username' => $validatedData['username'],
+                'password' => Hash::make($validatedData['password']),
                 'role' => 'siswa',
             ]);
 
-            // 2. Buat data siswa
-            Student::create([
-                'user_id' => $user->id,
-                'full_name' => $request->full_name,
-                'nisn' => $request->nisn,
-                'nis' => $request->nis,
-                'class_id' => $request->class_id,
-                'gender' => $request->gender,
-                'date_of_birth' => $request->date_of_birth,
-            ]);
+            $student = new Student($validatedData);
+            $student->user_id = $user->id;
+            $student->save();
 
             DB::commit();
+
+            // LOG: Mencatat keberhasilan
+            Log::info("Successfully stored new student with ID: {$student->id} and User ID: {$user->id}.");
+
+            return redirect()->route('admin.students.index')->with('success', 'Siswa baru berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            // Optional: log error $e->getMessage()
-            return back()->with('error', 'Gagal menambahkan siswa baru.')->withInput();
+            
+            // LOG: Mencatat error yang terjadi
+            Log::error("Failed to store new student: {$e->getMessage()}", [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->with('error', 'Gagal menambahkan siswa baru. Silakan coba lagi.')->withInput();
         }
-
-        return redirect()->route('admin.students.index')->with('success', 'Siswa baru berhasil ditambahkan.');
-    }
-
-    public function show(Student $student)
-    {
-        // Tampilkan detail spesifik jika perlu, atau redirect ke edit
-        return view('admin.students.show', compact('student'));
-    }
-
-    public function edit(Student $student)
-    {
-        $classes = Kelas::orderBy('name')->get();
-        return view('admin.students.edit', compact('student', 'classes'));
     }
 
     public function update(Request $request, Student $student)
     {
-        $request->validate([
+        // LOG: Mencatat upaya update
+        Log::info("Attempting to update student with ID: {$student->id}.");
+
+        $validatedData = $request->validate([
             'full_name' => 'required|string|max:255',
-            'nisn' => 'required|string|unique:students,nisn,' . $student->id,
-            'nis' => 'required|string|unique:students,nis,' . $student->id,
+            'nisn' => ['required', 'string', 'numeric', Rule::unique('students')->ignore($student->id)],
+            'nis' => ['required', 'string', 'numeric', Rule::unique('students')->ignore($student->id)],
             'class_id' => 'required|exists:classes,id',
             'gender' => 'required|in:laki-laki,perempuan',
             'date_of_birth' => 'required|date',
         ]);
 
-        // Update data di tabel students
-        $student->update($request->all());
+        DB::beginTransaction();
+        try {
+            $student->update($validatedData);
 
-        // Jika ingin update username/nama di tabel user juga
-        $student->user->update([
-            'name' => $request->full_name,
-        ]);
+            if ($student->user) {
+                $student->user->update(['name' => $request->full_name]);
+            }
 
-        return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui.');
+            DB::commit();
+
+            // LOG: Mencatat keberhasilan update
+            Log::info("Successfully updated student with ID: {$student->id}.");
+
+            return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // LOG: Mencatat error saat update
+            Log::error("Failed to update student with ID: {$student->id}. Error: {$e->getMessage()}", [
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Gagal memperbarui data siswa.')->withInput();
+        }
     }
 
     public function destroy(Student $student)
     {
-        // Karena ada onDelete('cascade') di migration, saat data siswa dihapus,
-        // data user yang terhubung juga akan ikut terhapus.
+        // LOG: Mencatat upaya penghapusan
+        Log::info("Attempting to delete student with ID: {$student->id} and associated User ID: {$student->user_id}.");
+
+        DB::beginTransaction();
         try {
+            $user = $student->user;
             $student->delete();
+
+            if ($user) {
+                $user->delete();
+            }
+
+            DB::commit();
+
+            // LOG: Mencatat keberhasilan penghapusan
+            Log::info("Successfully deleted student with ID: {$student->id}.");
+
+            return redirect()->route('admin.students.index')->with('success', 'Data siswa dan akun login terkait berhasil dihapus.');
         } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // LOG: Mencatat error saat penghapusan
+            Log::error("Failed to delete student with ID: {$student->id}. Error: {$e->getMessage()}", [
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return back()->with('error', 'Gagal menghapus siswa.');
         }
-
-        return redirect()->route('admin.students.index')->with('success', 'Data siswa berhasil dihapus.');
     }
 }

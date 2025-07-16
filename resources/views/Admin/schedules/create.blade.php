@@ -14,22 +14,25 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Class</label>
                         <select name="class_id" class="form-select" required>
-                            @foreach($classes as $class) <option value="{{ $class->id }}">{{ $class->name }}</option> @endforeach
+                            @foreach($classes as $class) <option value="{{ $class->id }}">{{ $class->name }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Subject</label>
                         <select name="subject_id" class="form-select" required>
-                            @foreach($subjects as $subject) <option value="{{ $subject->id }}">{{ $subject->name }}</option> @endforeach
+                            @foreach($subjects as $subject) <option value="{{ $subject->id }}">{{ $subject->name }}
+                            </option> @endforeach
                         </select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Teacher</label>
                         <select name="teacher_id" class="form-select" required>
-                            @foreach($teachers as $teacher) <option value="{{ $teacher->id }}">{{ $teacher->full_name }}</option> @endforeach
+                            @foreach($teachers as $teacher) <option value="{{ $teacher->id }}">{{ $teacher->full_name }}
+                            </option> @endforeach
                         </select>
                     </div>
-                     <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label class="form-label">Day</label>
                         <select name="day_of_week" class="form-select" required>
                             @foreach($days as $key => $day) <option value="{{ $key }}">{{ $day }}</option> @endforeach
@@ -43,10 +46,11 @@
                         <label class="form-label">End Time</label>
                         <input type="time" class="form-control" name="end_time" required />
                     </div>
-                     <div class="col-md-12 mb-3">
+                    <div class="col-md-12 mb-3">
                         <label class="form-label">Academic Year</label>
                         <select name="academic_year_id" class="form-select" required>
-                            @foreach($academicYears as $year) <option value="{{ $year->id }}" @if($year->status == 'active') selected @endif>{{ $year->year }}</option> @endforeach
+                            @foreach($academicYears as $year) <option value="{{ $year->id }}" @if($year->status ==
+                                'active') selected @endif>{{ $year->year }}</option> @endforeach
                         </select>
                     </div>
                 </div>

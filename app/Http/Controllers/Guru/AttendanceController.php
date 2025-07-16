@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Guru;
 
+use App\Http\Controllers\Controller;
+use App\Models\Attendance;
+use App\Models\Schedule;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\Schedule;
-use App\Models\Student;
-use App\Models\Attendance;
 
 class AttendanceController extends Controller
 {
-    /**
-     * Menampilkan halaman untuk mengambil absensi.
-     */
     public function create(Schedule $schedule)
     {
         if (Auth::user()->teacher->id !== $schedule->teacher_id) {
@@ -23,15 +21,12 @@ class AttendanceController extends Controller
         $students = Student::where('class_id', $schedule->class_id)->orderBy('full_name', 'asc')->get();
         $today = now()->toDateString();
 
-        // --- PERUBAHAN DI SINI ---
-        // Ambil seluruh data absensi yang ada dan jadikan student_id sebagai key
         $existingAttendance = Attendance::where('schedule_id', $schedule->id)
             ->where('date', $today)
             ->get()
-            ->keyBy('student_id'); // Hasilnya adalah collection of Attendance models
+            ->keyBy('student_id');
 
-        // PERBAIKAN: Mengarahkan ke view yang benar
-        return view('user.attendances.create', [
+        return view('guru.attendances.create', [
             'schedule' => $schedule,
             'students' => $students,
             'existingAttendance' => $existingAttendance,
@@ -39,9 +34,6 @@ class AttendanceController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan data absensi yang di-submit oleh guru.
-     */
     public function store(Request $request, Schedule $schedule)
     {
         $request->validate([
@@ -53,8 +45,7 @@ class AttendanceController extends Controller
         $today = now()->toDateString();
         $teacherId = Auth::user()->teacher->id;
 
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($request, $schedule, $today, $teacherId) {
             foreach ($request->attendances as $attendanceData) {
                 Attendance::updateOrCreate(
                     [
@@ -69,13 +60,8 @@ class AttendanceController extends Controller
                     ]
                 );
             }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat menyimpan data absensi.');
-        }
+        });
         
-        // PERBAIKAN: Menggunakan nama route yang benar
-        return redirect()->route('user.schedules.index')->with('success', 'Absensi berhasil disimpan!');
+        return redirect()->route('guru.schedules.index')->with('success', 'Absensi berhasil disimpan!');
     }
 }

@@ -18,8 +18,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet" />
-    {{--
-    <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/boxicons.css') }}" /> --}}
+    
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
 
@@ -77,7 +76,6 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    {{-- ✅ Menampilkan nama user yang login --}}
                                                     <span class="fw-medium d-block">{{ Auth::user()->name }}</span>
                                                     <small class="text-muted">{{ Auth::user()->email }}</small>
                                                 </div>
@@ -97,7 +95,6 @@
                                         <div class="dropdown-divider"></div>
                                     </li>
                                     <li>
-                                        {{-- ✅ Form Logout yang lebih aman --}}
                                         <form action="{{ route('logout') }}" method="POST" id="logout-form">
                                             @csrf
                                             <a class="dropdown-item" href="#"
@@ -129,13 +126,11 @@
     <script src="{{ asset('assets/vendor/js/bootstrap.js') }}"></script>
     <script src="{{ asset('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
     <script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
-
     <script src="{{ asset('assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
-
     <script src="{{ asset('assets/js/main.js') }}"></script>
 
-    @stack('scripts')
+    {{-- ✅ PERBAIKAN FINAL: Mengubah @stack menjadi @yield agar cocok dengan @section --}}
+    @yield('scripts')
 
 </body>
-
 </html>

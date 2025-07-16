@@ -81,9 +81,9 @@ class LoginController extends Controller
             case 'admin':
                 return route('admin.dashboard');
             case 'guru':
-                return route('schedules.index');
+                return route('guru.schedules.index');
             case 'siswa':
-                return route('schedules.index');
+                return route('siswa.schedules.index');
             default:
                 return '/'; // Halaman default jika role tidak dikenali
         }

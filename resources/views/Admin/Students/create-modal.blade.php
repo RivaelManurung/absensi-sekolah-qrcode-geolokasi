@@ -49,8 +49,6 @@
                     </div>
 
                     <hr><p class="text-muted">Login Account</p>
-
-                    {{-- Login Account --}}
                     <div class="mb-3">
                         <label class="form-label">Username</label>
                         <input type="text" class="form-control" name="username" placeholder="Can be same as NISN" value="{{ old('username') }}" required />
