@@ -27,4 +27,16 @@ class Schedule extends Model
     {
         return $this->belongsTo(Teacher::class);
     }
+
+    // ✅ TAMBAHAN: Relasi ke Tahun Ajaran
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
+    }
+    
+    // ✅ TAMBAHAN: Relasi ke Absensi (untuk fitur hapus)
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class); // Ganti "Attendance" jika nama model Anda berbeda
+    }
 }

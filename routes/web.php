@@ -75,7 +75,10 @@ Route::middleware(['auth'])->group(function () {
 
         // Manajemen Pengajuan Izin
         Route::resource('leave-requests', Siswa\LeaveRequestController::class)->except(['edit', 'update', 'destroy']);
-
+        // ✅ TAMBAHAN: Route untuk menampilkan halaman scanner QR Code
+        Route::get('/attendance/scan', function () {
+            return view('student.attendance.scan');
+        })->name('attendance.scan');
         // Melihat riwayat kehadiran pribadi
         // Route::get('/kehadiran', [Siswa\AttendanceController::class, 'index'])->name('attendances.index');
     });

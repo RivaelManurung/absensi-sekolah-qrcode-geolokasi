@@ -100,6 +100,7 @@ class AdminScheduleController extends Controller
      */
     public function destroy(Schedule $schedule)
     {
+        // Pengecekan ini memerlukan relasi 'attendances' di model Schedule
         if ($schedule->attendances()->exists()) {
             return back()->with('error', 'Gagal menghapus. Jadwal ini sudah memiliki riwayat absensi.');
         }

@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
                         <div class="avatar flex-shrink-0">
-                            <img src="{{ asset('assets/img/icons/unicons/user-check.png') }}" alt="Siswa" class="rounded" />
+                             <span class="avatar-initial rounded bg-label-success"><i class="bx bx-group"></i></span>
                         </div>
                     </div>
                     <span>Jumlah Siswa</span>
@@ -45,7 +45,7 @@
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
                         <div class="avatar flex-shrink-0">
-                            <img src="{{ asset('assets/img/icons/unicons/briefcase-alt.png') }}" alt="Guru" class="rounded" />
+                            <span class="avatar-initial rounded bg-label-info"><i class="bx bx-briefcase-alt-2"></i></span>
                         </div>
                     </div>
                     <span>Jumlah Guru</span>
@@ -58,7 +58,7 @@
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
                         <div class="avatar flex-shrink-0">
-                            <img src="{{ asset('assets/img/icons/unicons/building.png') }}" alt="Kelas" class="rounded" />
+                            <span class="avatar-initial rounded bg-label-warning"><i class="bx bx-building-house"></i></span>
                         </div>
                     </div>
                     <span>Jumlah Kelas</span>
@@ -71,7 +71,7 @@
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
                         <div class="avatar flex-shrink-0">
-                            <img src="{{ asset('assets/img/icons/unicons/calendar-alt.png') }}" alt="Tahun Ajaran" class="rounded" />
+                            <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-calendar-alt"></i></span>
                         </div>
                     </div>
                     <span>Tahun Ajaran Aktif</span>

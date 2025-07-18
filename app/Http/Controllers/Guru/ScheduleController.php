@@ -23,7 +23,7 @@ class ScheduleController extends Controller
         }
 
         $schedulesByDay = $schedules->groupBy('day_of_week');
-        
+
         return view('guru.schedules.index', [
             'schedulesByDay' => $schedulesByDay,
             'pageTitle' => 'Jadwal Mengajar'

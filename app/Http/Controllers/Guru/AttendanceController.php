@@ -41,7 +41,7 @@ class AttendanceController extends Controller
             'attendances.*.student_id' => 'required|exists:students,id',
             'attendances.*.status' => 'required|in:hadir,sakit,izin,alpa',
         ]);
-        
+
         $today = now()->toDateString();
         $teacherId = Auth::user()->teacher->id;
 
@@ -61,7 +61,7 @@ class AttendanceController extends Controller
                 );
             }
         });
-        
+
         return redirect()->route('guru.schedules.index')->with('success', 'Absensi berhasil disimpan!');
     }
 }
